@@ -16,7 +16,7 @@ class UDP_Server // UDP Echo Server
 public:
 	UDP_Server(boost::asio::io_service& io_service) :m_Socket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), SERVER_PORT_NUMBER))
 	{
-		PostReceive();
+		PostReceive(); // io_service에 서버 포트 할당 및 수신 대기
 	}
 	~UDP_Server() {}
 
