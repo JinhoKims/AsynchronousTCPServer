@@ -83,10 +83,9 @@ class TCP_Server // TCP 서버
 public:
 	int m_nSeqNumber;
 	boost::asio::ip::tcp::acceptor m_acceptor; // 클라이언트의 접속을 담당하는 객체
-	boost::asio::io_service& m_io_service; // I/O 이벤트를 OS에서 디스패치하는 객체
 	Session* m_pSession;
 
-	TCP_Server(boost::asio::io_service& io_service) : m_io_service(io_service), m_acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER))
+	TCP_Server(boost::asio::io_service& io_service) : m_acceptor(io_service, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), PORT_NUMBER))
 	{
 		m_pSession = nullptr;
 		StartAccept(); // 클라이언트 접속 받기
@@ -104,7 +103,7 @@ private:
 	void StartAccept() // 클라이언트 접속 받기 (1회 한정)
 	{
 		cout << "클라이언트 접속 대기..." << endl;
-		m_pSession = new Session(m_io_service);
+		m_pSession = new Session((boost::asio::io_context&)m_acceptor.get_executor().context());
 		m_acceptor.async_accept(m_pSession->Socket(), boost::bind(&TCP_Server::handle_accept, this, m_pSession, boost::asio::placeholders::error)); // 클라이언트의 접속을 비동기로 처리
 		/*
 			첫 번째 인자는 클라이언트에 할당할 소켓 클래스를 뜻하며,
